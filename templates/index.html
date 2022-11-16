@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+</head>
+<body>
+
+<h1>{{ project_name }}</h1>
+    {% for scooter in scooters %}
+        {{ scooter.name }}<br>
+    {% endfor %}
+
+<p>{{ scooters }}</p>
+
+</body>
+</html>
