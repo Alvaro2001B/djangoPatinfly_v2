@@ -9,7 +9,7 @@ frontend/__pycache__
 core/migrations
 ___static/
 Static_files/
-logs/
+logs/*.log
 endpoints/migrations
 frontend/migrations
 db.sqlite3
