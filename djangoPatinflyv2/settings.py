@@ -133,7 +133,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'Static_files')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -141,9 +140,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'Static_files')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 if HEROKU_LOGGING_FILE:
     LOGGING_FILE = '/app/logs/debug.log'
+    STATIC_ROOT = "/app/Static_files"
 else:
     LOGGING_FILE = os.path.join(BASE_DIR, 'logs\\debug.log')
-
+    STATIC_ROOT = os.path.join(BASE_DIR, 'Static_files')
 
 LOGGING = {
     'version': 1,
