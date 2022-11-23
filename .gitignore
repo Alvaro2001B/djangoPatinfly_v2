@@ -8,6 +8,7 @@ endpoints/__pycache__
 frontend/__pycache__
 core/migrations
 static/
+logs/
 endpoints/migrations
 frontend/migrations
 Static_files

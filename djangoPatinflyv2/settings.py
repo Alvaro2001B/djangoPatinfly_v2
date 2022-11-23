@@ -24,8 +24,9 @@ SECRET_KEY = 'django-insecure-0&&iso+u(@x44(as#!#7g$@gwk_@9v5z5&26s=y!tt4tq3n-j(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+HEROKU_LOGGING_FILE = not DEBUG
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["patin-volador.herokuapp.com","127.0.0.1"]
 
 
 # Application definition
@@ -138,3 +139,27 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'Static_files')
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+if HEROKU_LOGGING_FILE:
+    LOGGING_FILE = '/app/logs/debug.log'
+else:
+    LOGGING_FILE = os.path.join(BASE_DIR, 'logs\\debug.log')
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': LOGGING_FILE,
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
