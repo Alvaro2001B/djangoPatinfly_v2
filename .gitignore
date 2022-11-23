@@ -7,11 +7,11 @@ core/__pycache__
 endpoints/__pycache__
 frontend/__pycache__
 core/migrations
-static/
+___static/
+Static_files/
 logs/
 endpoints/migrations
 frontend/migrations
-Static_files
 db.sqlite3
 media
 
