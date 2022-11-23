@@ -142,7 +142,7 @@ if HEROKU_LOGGING_FILE:
     LOGGING_FILE = '/app/logs/debug.log'
     STATIC_ROOT = "/app/Static_files"
 else:
-    LOGGING_FILE = os.path.join(BASE_DIR, 'logs\\debug.log')
+    LOGGING_FILE = os.path.join(BASE_DIR, 'logs\\debug.local.log')
     STATIC_ROOT = os.path.join(BASE_DIR, 'Static_files')
 
 LOGGING = {
