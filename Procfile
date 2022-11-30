@@ -1,0 +1,1 @@
+web: guinicorn djangoPatinflyv2.wsgi

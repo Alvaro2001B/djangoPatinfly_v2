@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-0&&iso+u(@x44(as#!#7g$@gwk_@9v5z5&26s=y!tt4tq3n-j(
 DEBUG = False
 HEROKU_LOGGING_FILE = not DEBUG
 
-ALLOWED_HOSTS = ["patin-volador.herokuapp", "127.0.0.1"]
+ALLOWED_HOSTS = ["patin-volador.herokuapp.com" , "127.0.0.1"]
 
 # Application definition
 
