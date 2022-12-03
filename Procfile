@@ -1,1 +1,1 @@
-web: guinicorn djangoPatinflyv2.wsgi
+web: gunicorn djangoPatinflyv2.wsgi
