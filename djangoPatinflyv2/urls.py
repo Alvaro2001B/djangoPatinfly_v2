@@ -38,17 +38,18 @@ class ScooterViewSet(viewsets.ModelViewSet):
     queryset = Scooter.objects.all()
     serializer_class = ScooterSerializer
 
-
 class LoginViewSet(viewsets.ModelViewSet):
-    queryset = UserLogin.objects.all()
-    serializer_class = LoginSerializer
+   queryset = UserLogin.objects.all()
+   serializer_class = LoginSerializer
+
+
 
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'scooter', ScooterViewSet)
-router.register(r'login', LoginViewSet)
+router.register('endpoints/login',LoginViewSet)
 
 urlpatterns = [
     path('admin_patinfly/', admin.site.urls),

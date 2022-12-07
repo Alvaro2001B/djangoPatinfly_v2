@@ -1,6 +1,7 @@
-from rest_framework import serializers
+from rest_framework import serializers, request
 from rest_framework.authtoken.admin import User
-
+from rest_framework.response import Response
+from rest_framework.decorators import  api_view
 from core.models import Scooter, UserLogin
 
 
@@ -22,3 +23,7 @@ class LoginSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserLogin
         fields = ['name', 'token']
+        read_only_fileds = ['token']
+
+
+
