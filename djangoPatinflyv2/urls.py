@@ -20,10 +20,11 @@ from django.contrib.auth.models import User
 from django.urls import path, include
 from rest_framework import routers, serializers, viewsets
 
-from core.models import Scooter, UserLogin
+from core.models import Scooter, UserLogin, Rent
 from djangoPatinflyv2 import settings
-from endpoints.views import UserSerializer, ScooterSerializer, LoginSerializer
+from endpoints.views import UserSerializer, ScooterSerializer, LoginSerializer, RentSerializer
 from frontend import views as frontend_views
+from core import views as core_views
 
 
 # ViewSets define the view behavior.
@@ -38,22 +39,29 @@ class ScooterViewSet(viewsets.ModelViewSet):
     queryset = Scooter.objects.all()
     serializer_class = ScooterSerializer
 
+
 class LoginViewSet(viewsets.ModelViewSet):
-   queryset = UserLogin.objects.all()
-   serializer_class = LoginSerializer
+    queryset = UserLogin.objects.all()
+    serializer_class = LoginSerializer
 
 
+class RentViewSet(viewsets.ModelViewSet):
+    queryset = Rent.objects.all()
+    serializer_class = RentSerializer
 
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'scooter', ScooterViewSet)
-router.register('endpoints/login',LoginViewSet)
+router.register('endpoints/login', LoginViewSet)
+router.register('endpoints/rent', RentViewSet)
 
 urlpatterns = [
-    path('admin_patinfly/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
-    path('', include(router.urls)),
-    path('index', frontend_views.index)
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+                  path('admin_patinfly/', admin.site.urls),
+                  path('api-auth/', include('rest_framework.urls')),
+                  path('', include(router.urls)),
+                  path('index', frontend_views.index),
+                  path('prueba', core_views.login)
+
+              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

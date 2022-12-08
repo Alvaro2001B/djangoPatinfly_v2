@@ -2,7 +2,8 @@ from rest_framework import serializers, request
 from rest_framework.authtoken.admin import User
 from rest_framework.response import Response
 from rest_framework.decorators import  api_view
-from core.models import Scooter, UserLogin
+from rest_framework.authtoken.views import obtain_auth_token
+from core.models import Scooter, UserLogin, Rent
 
 
 # Serializers define the API representation.
@@ -22,8 +23,14 @@ class ScooterSerializer(serializers.HyperlinkedModelSerializer):
 class LoginSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserLogin
-        fields = ['name', 'token']
-        read_only_fileds = ['token']
+        fields = ['name','secondname', 'token', 'create_date','update_date', 'notification_uptadete']
+        read_only_fields = ['create_date','update_date', 'notification_uptadete',]
 
+
+class RentSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Rent
+        fields = ['uuid','name', 'token', 'vacant', 'create_date','update_date', 'notification_uptadete' ]
+        read_only_fields = ['create_date','update_date', 'notification_uptadete',]
 
 
