@@ -58,6 +58,7 @@ router.register(r'users', UserViewSet)
 router.register(r'scooter', ScooterViewSet)
 router.register('endpoints/login', LoginViewSet)
 router.register('endpoints/rent', RentViewSet)
+#router.register('endpoints/rent/star/(?P<scooter_uuid>[0-9]+)',core_views.startRent )
 
 urlpatterns = [
                   path('admin_patinfly/', admin.site.urls),

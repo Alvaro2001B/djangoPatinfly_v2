@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from core.models import UserLogin, Scooter
+from rest_framework import status
 
 
 # Create your views here.
@@ -14,7 +15,6 @@ from core.models import UserLogin, Scooter
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes((AllowAny,))
 def login(request):
-    # secondname = request.POST.get('secondname')
     print(request.data)
     if request.method == 'GET':
         username = request.data['username']
@@ -24,14 +24,18 @@ def login(request):
             print(UserLogin.objects.all())
             user = UserLogin.objects.get(name=username)
         except User.DoesNotExist:
-            return Response('Usuario invalido')
+            content = {
+                'msg': 'non-existent user',
+                'code': status.HTTP_400_BAD_REQUEST
+            }
+            return Response(content)
 
         # pwd_valid = check_password(password, user.password)
         # if not pwd_valid:
         #    return Response("Contraseña invalida")
         content = {
             "Token": user.token,
-            "Code": "200 "
+            "Code": status.HTTP_200_OK
         }
         return Response(content)
     elif request.method == 'POST':
@@ -42,7 +46,8 @@ def login(request):
         try:
             UserLogin.objects.get(name=username)
             content = {
-                "msg": "Ya existe"
+                "msg": "existing user",
+                "code": status.HTTP_400_BAD_REQUEST
             }
             return Response(content)
         except:
@@ -55,23 +60,27 @@ def login(request):
                 password=password,
                 token=token
             )
-            # user = authenticate(username=username, password=password)
-            # print(user)
-            # token = Token.objects.get_or_create(user=user)
-            print(token)
-            # UserLogin.objects.get(name=username).token=token
             content = {
                 "msg": "User añadido",
-                "Token": str(token)
+                "token": str(token),
+                'code': status.HTTP_201_CREATED
             }
             return Response(content)
     elif request.method == 'DELETE':
         UserLogin.objects.all().delete()
-        return Response({"msg": "REMOVE ALL"})
+        content = {
+            'msg': 'Deleted users',
+            'code': status.HTTP_200_OK
+        }
+        return Response(content)
 
     # UserLogin.objects.create(name=username,secondname= secondname,token=token, password=password )
 
 
 @api_view(['GET'])
-def startRent(request, uuid):
-    scooter = Scooter.objects.get(uuid=uuid)
+def startRent(request, scooter_uuid):
+    print(scooter_uuid)
+    # scooter = Scooter.objects.get(uuid=scooter_uuid)
+    content = {
+        'code': status.HTTP_200_OK
+    }
