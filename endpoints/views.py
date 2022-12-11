@@ -1,9 +1,10 @@
 from rest_framework import serializers, request
 from rest_framework.authtoken.admin import User
 from rest_framework.response import Response
-from rest_framework.decorators import  api_view
+from rest_framework.decorators import api_view
 from rest_framework.authtoken.views import obtain_auth_token
 from core.models import Scooter, UserLogin, Rent
+from rest_framework.authtoken.models import Token
 
 
 # Serializers define the API representation.
@@ -23,14 +24,15 @@ class ScooterSerializer(serializers.HyperlinkedModelSerializer):
 class LoginSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserLogin
-        fields = ['name','secondname', 'token', 'create_date','update_date', 'notification_uptadete']
-        read_only_fields = ['create_date','update_date', 'notification_uptadete',]
+        fields = ['name', 'secondname', 'password', 'token', 'create_date', 'update_date', 'notification_uptadete']
+        read_only_fields = [ 'create_date', 'update_date', 'notification_uptadete', ]
+
+
+
 
 
 class RentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Rent
-        fields = ['uuid','name', 'token', 'vacant', 'create_date','update_date', 'notification_uptadete' ]
-        read_only_fields = ['create_date','update_date', 'notification_uptadete',]
-
-
+        fields = ['uuid', 'name', 'token', 'vacant', 'create_date', 'update_date', 'notification_uptadete']
+        read_only_fields = ['create_date', 'update_date', 'notification_uptadete', ]

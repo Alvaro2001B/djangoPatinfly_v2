@@ -19,32 +19,34 @@ from django.contrib.auth.models import User
 
 from django.urls import path, include
 from rest_framework import routers, serializers, viewsets
+from rest_framework.decorators import permission_classes
 
 from core.models import Scooter, UserLogin, Rent
 from djangoPatinflyv2 import settings
 from endpoints.views import UserSerializer, ScooterSerializer, LoginSerializer, RentSerializer
 from frontend import views as frontend_views
 from core import views as core_views
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 # ViewSets define the view behavior.
 
-
+@permission_classes((AllowAny,))
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-
+@permission_classes((AllowAny,))
 class ScooterViewSet(viewsets.ModelViewSet):
     queryset = Scooter.objects.all()
     serializer_class = ScooterSerializer
 
-
+@permission_classes((AllowAny,))
 class LoginViewSet(viewsets.ModelViewSet):
     queryset = UserLogin.objects.all()
     serializer_class = LoginSerializer
 
-
+@permission_classes((AllowAny,))
 class RentViewSet(viewsets.ModelViewSet):
     queryset = Rent.objects.all()
     serializer_class = RentSerializer
