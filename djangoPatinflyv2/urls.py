@@ -17,7 +17,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.models import User
 
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework import routers, serializers, viewsets
 from rest_framework.decorators import permission_classes
 
@@ -65,6 +65,8 @@ urlpatterns = [
                   path('api-auth/', include('rest_framework.urls')),
                   path('', include(router.urls)),
                   path('index', frontend_views.index),
-                  path('prueba', core_views.login)
+                  path('prueba', core_views.login),
+                  re_path(r'endpoints/rent/star', core_views.startRent)
+                  #path('endpoints/rent/star/<int:pk>', core_views.startRent
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

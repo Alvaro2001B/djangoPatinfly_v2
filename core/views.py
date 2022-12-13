@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import check_password
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from core.models import UserLogin, Scooter
+from core.models import UserLogin, Scooter, Rent
 from rest_framework import status
 
 
@@ -78,9 +78,13 @@ def login(request):
 
 
 @api_view(['GET'])
-def startRent(request, scooter_uuid):
-    print(scooter_uuid)
-    # scooter = Scooter.objects.get(uuid=scooter_uuid)
-    content = {
-        'code': status.HTTP_200_OK
-    }
+@permission_classes((AllowAny,))
+def startRent(request):
+    if request.method == 'GET':
+        rent = Rent.objects.all
+        # scooter = Scooter.objects.get(uuid=scooter_uuid)
+        print(str(rent))
+        content = {
+            'code': status.HTTP_200_OK
+        }
+    return Response(content)
