@@ -66,7 +66,7 @@ urlpatterns = [
                   path('', include(router.urls)),
                   path('index', frontend_views.index),
                   path('prueba', core_views.login),
-                  re_path(r'endpoints/rent/star', core_views.startRent)
+                  path(r'endpoints/rent/start/<str:scooter_uuid>', core_views.startRent)
                   #path('endpoints/rent/star/<int:pk>', core_views.startRent
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

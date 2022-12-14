@@ -34,7 +34,7 @@ def login(request):
         # if not pwd_valid:
         #    return Response("Contraseña invalida")
         content = {
-            "Token": user.token,
+            "Token": user.token.split(':')[1].split(">")[0],
             "Code": status.HTTP_200_OK
         }
         return Response(content)
@@ -79,7 +79,8 @@ def login(request):
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
-def startRent(request):
+def startRent(request, scooter_uuid):
+    print("scooter uuid", scooter_uuid)
     if request.method == 'GET':
         rent = Rent.objects.all
         # scooter = Scooter.objects.get(uuid=scooter_uuid)
