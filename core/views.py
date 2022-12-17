@@ -1,7 +1,7 @@
+from datetime import datetime
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from django.contrib.auth.hashers import check_password
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
@@ -58,11 +58,14 @@ def login(request):
                 name=username,
                 secondname=secondname,
                 password=password,
-                token=token
+                token=""
             )
+            user = UserLogin.objects.get(name=username)
+            user.token = token
+            user.save()
             content = {
                 "msg": "User añadido",
-                "token": str(token),
+                "token": str(token[0]),
                 'code': status.HTTP_201_CREATED
             }
             return Response(content)
@@ -75,6 +78,67 @@ def login(request):
         return Response(content)
 
     # UserLogin.objects.create(name=username,secondname= secondname,token=token, password=password )
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def validate(request):
+    if request.method == 'GET':
+        username = request.data['username']
+        token = request.data['token']
+
+        print('Request:' + str(username) + '-' + str(token))
+        try:
+            user = UserLogin.objects.get(name=username)
+            userT = authenticate(username=username, password=user.password)
+            tokenUser = Token.objects.get_or_create(user=userT)
+            print('User:' + str(user.name) + '-' + str(tokenUser[0]))
+            if user.token == "":
+                content = {
+                    'msg': 'User not validated',
+                    'code': status.HTTP_400_BAD_REQUEST
+                }
+                return Response(content)
+            elif str(tokenUser[0]) == token:
+                timeNow = datetime.now()
+                print(timeNow)
+                print(user.create_date)
+                print(timeNow.date() - user.create_date.date())
+                days = (timeNow.date() - user.create_date.date()).days
+                print(days)
+                if int(days) < int(3):
+                    content = {
+                        'msg': 'User validated',
+                        'code': status.HTTP_200_OK
+                    }
+                    return Response(content)
+                else:
+                    print(user)
+                    user.token = ""
+                    user.save()
+                    Token.objects.filter(user=userT).delete()
+                    token = Token.objects.get_or_create(user=userT)
+                    print(token)
+                    user.token = token
+                    user.save()
+                    content = {
+                        'msg': 'Create a new token. User validated',
+                        'token': str(user.token[0]),
+                        'code': status.HTTP_200_OK
+                    }
+                    return Response(content)
+            else:
+                content = {
+                    'msg':'Invalida token',
+                    'code':status.HTTP_401_UNAUTHORIZED
+                }
+                return Response(content)
+        except:
+            content = {
+                'msg': 'non-existent user',
+                'code': status.HTTP_400_BAD_REQUEST
+            }
+            return Response(content)
 
 
 @api_view(['GET'])
