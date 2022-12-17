@@ -26,7 +26,9 @@ def login(request):
         except User.DoesNotExist:
             content = {
                 'msg': 'non-existent user',
-                'code': status.HTTP_400_BAD_REQUEST
+                'code': status.HTTP_400_BAD_REQUEST,
+                'timestanp': datetime.now(),
+                'version': '1.0'
             }
             return Response(content)
 
@@ -34,8 +36,11 @@ def login(request):
         # if not pwd_valid:
         #    return Response("Contraseña invalida")
         content = {
-            "Token": user.token.split(':')[1].split(">")[0],
-            "Code": status.HTTP_200_OK
+            "Token": user.token,
+            # .split(':')[1].split(">")[0],
+            "Code": status.HTTP_200_OK,
+            'timestanp': datetime.now(),
+            'version': '1.0'
         }
         return Response(content)
     elif request.method == 'POST':
@@ -47,7 +52,9 @@ def login(request):
             UserLogin.objects.get(name=username)
             content = {
                 "msg": "existing user",
-                "code": status.HTTP_400_BAD_REQUEST
+                "code": status.HTTP_400_BAD_REQUEST,
+                'timestanp': datetime.now(),
+                'version': '1.0'
             }
             return Response(content)
         except:
@@ -61,19 +68,24 @@ def login(request):
                 token=""
             )
             user = UserLogin.objects.get(name=username)
-            user.token = token
+            user.token = str(token).split(':')[1].split(">")[0].split(" ")[1]
             user.save()
             content = {
                 "msg": "User añadido",
-                "token": str(token[0]),
-                'code': status.HTTP_201_CREATED
+                "token": str(user.token),
+                'code': status.HTTP_201_CREATED,
+                'timestanp': datetime.now(),
+                'version': '1.0'
             }
             return Response(content)
     elif request.method == 'DELETE':
         UserLogin.objects.all().delete()
+        #Rent.objects.all().delete()
         content = {
             'msg': 'Deleted users',
-            'code': status.HTTP_200_OK
+            'code': status.HTTP_200_OK,
+            'timestanp': datetime.now(),
+            'version': '1.0'
         }
         return Response(content)
 
@@ -96,10 +108,12 @@ def validate(request):
             if user.token == "":
                 content = {
                     'msg': 'User not validated',
-                    'code': status.HTTP_400_BAD_REQUEST
+                    'code': status.HTTP_400_BAD_REQUEST,
+                    'timestamp': datetime.now(),
+                    'version': '1.0'
                 }
                 return Response(content)
-            elif str(tokenUser[0]) == token:
+            elif str(tokenUser) == token:
                 timeNow = datetime.now()
                 print(timeNow)
                 print(user.create_date)
@@ -109,7 +123,9 @@ def validate(request):
                 if int(days) < int(3):
                     content = {
                         'msg': 'User validated',
-                        'code': status.HTTP_200_OK
+                        'code': status.HTTP_200_OK,
+                        'timestamp': datetime.now(),
+                        'version': '1.0'
                     }
                     return Response(content)
                 else:
@@ -119,24 +135,30 @@ def validate(request):
                     Token.objects.filter(user=userT).delete()
                     token = Token.objects.get_or_create(user=userT)
                     print(token)
-                    user.token = token
+                    user.token = str(token).split(':')[1].split(">")[0].split(" ")[1]
                     user.save()
                     content = {
                         'msg': 'Create a new token. User validated',
-                        'token': str(user.token[0]),
-                        'code': status.HTTP_200_OK
+                        'token': str(user.token),
+                        'code': status.HTTP_200_OK,
+                        'timestamp': datetime.now(),
+                        'version': '1.0'
                     }
                     return Response(content)
             else:
                 content = {
-                    'msg':'Invalida token',
-                    'code':status.HTTP_401_UNAUTHORIZED
+                    'msg': 'Invalid token',
+                    'code': status.HTTP_401_UNAUTHORIZED,
+                    'timestamp': datetime.now(),
+                    'version': '1.0'
                 }
                 return Response(content)
         except:
             content = {
                 'msg': 'non-existent user',
-                'code': status.HTTP_400_BAD_REQUEST
+                'code': status.HTTP_400_BAD_REQUEST,
+                'timestamp': datetime.now(),
+                'version': '1.0'
             }
             return Response(content)
 
@@ -144,12 +166,134 @@ def validate(request):
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def startRent(request, scooter_uuid):
-    print("scooter uuid", scooter_uuid)
     if request.method == 'GET':
-        rent = Rent.objects.all
-        # scooter = Scooter.objects.get(uuid=scooter_uuid)
-        print(str(rent))
-        content = {
-            'code': status.HTTP_200_OK
-        }
-    return Response(content)
+        print("scooter uuid", scooter_uuid)
+        token = request.data['token']
+        try:
+            user = UserLogin.objects.get(token=token)
+            scooter = Scooter.objects.get(uuid=scooter_uuid)
+        except:
+            content = {
+                'msg': 'Invalid parameters',
+                'code': status.HTTP_400_BAD_REQUEST
+            }
+            return Response(content)
+        try:
+            rent = Rent.objects.get(uuid=scooter_uuid)
+            if rent.vacant == 1:
+                content = {
+                    'code': status.HTTP_200_OK,
+                    'msg': 'Scooter is alredy rented',
+                    'rent': {
+                        'uuid': rent.uuid,
+                        'date_start': rent.update_date
+                    },
+                    'timestamp': datetime.now(),
+                    'version': '1.0'
+                }
+                return Response(content)
+            else:
+                if not scooter.vacant:
+                    Rent.objects.create(
+                        uuid=scooter_uuid,
+                        name=user.name,
+                        token=token,
+                        vacant=True,
+                        update_date=datetime.now()
+                    )
+                    scooter.vacant = True
+                    scooter.save()
+                    rent = Rent.objects.get(uuid=scooter_uuid)
+                    content = {
+                        'code': status.HTTP_200_OK,
+                        'msg': 'Scooter rented',
+                        'rent': {
+                            'uuid': rent.uuid,
+                            'date_start': rent.update_date
+                        },
+                        'timestamp': datetime.now(),
+                        'version': '1.0'
+                    }
+                    return Response(content)
+                else:
+                    content = {
+                        'code': status.HTTP_405_METHOD_NOT_ALLOWED,
+                        'msg': 'Scooter is vacant',
+                        'rent': '{}',
+                        'timestamp': datetime.now(),
+                        'version': '1.0'
+                    }
+                    return Response(content)
+        except:
+            if not scooter.vacant:
+                Rent.objects.create(
+                    uuid=scooter_uuid,
+                    name=user.name,
+                    token=token,
+                    update_date=datetime.now()
+                )
+                scooter.vacant = True
+                scooter.save()
+                rent = Rent.objects.get(uuid=scooter_uuid)
+                content = {
+                    'code': status.HTTP_200_OK,
+                    'msg': 'Scooter rented',
+                    'rent': {
+                        'uuid': rent.uuid,
+                        'date_start': rent.update_date
+                    },
+                    'timestamp': datetime.now(),
+                    'version': '1.0'
+                }
+                return Response(content)
+            else:
+                content = {
+                    'code': status.HTTP_405_METHOD_NOT_ALLOWED,
+                    'msg': 'Scooter is vacant',
+                    'rent': '{}',
+                    'timestamp': datetime.now(),
+                    'version': '1.0'
+                }
+                return Response(content)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def stopRent(request, scooter_uuid):
+    if request.method == 'GET':
+        print("scooter uuid", scooter_uuid)
+        token = request.data['token']
+        try:
+            user = UserLogin.objects.get(token=token)
+            scooter = Scooter.objects.get(uuid=scooter_uuid)
+        except:
+            content = {
+                'msg': 'Invalid parameters',
+                'code': status.HTTP_400_BAD_REQUEST,
+                'timestamp': datetime.now(),
+                'version': '1.0'
+            }
+            return Response(content)
+        try:
+            rent = Rent.objects.get(uuid=scooter_uuid)
+            if rent.vacant:
+                rent.vacant = False
+                rent.save()
+            else:
+                content = {
+                    'msg': 'Scooter not vacant ',
+                    'code': status.HTTP_405_METHOD_NOT_ALLOWED,
+                    'timestamp': datetime.now(),
+                    'version': '1.0'
+                }
+                return Response(content)
+        except:
+            content = {
+                'msg': 'Scootet not rented',
+                'code': status.HTTP_400_BAD_REQUEST,
+                'timestamp': datetime.now(),
+                'version': '1.0'
+            }
+            return Response(content)
+
+        # if scooter.vacant == 1:
