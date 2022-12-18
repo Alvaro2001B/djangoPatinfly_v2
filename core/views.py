@@ -79,8 +79,8 @@ def login(request):
             }
             return Response(content)
     elif request.method == 'DELETE':
-        UserLogin.objects.all().delete()
-        #Rent.objects.all().delete()
+        #UserLogin.objects.all().delete()
+        Rent.objects.all().delete()
         content = {
             'msg': 'Deleted users',
             'code': status.HTTP_200_OK,
@@ -179,8 +179,8 @@ def startRent(request, scooter_uuid):
             }
             return Response(content)
         try:
-            rent = Rent.objects.get(uuid=scooter_uuid)
-            if rent.vacant == 1:
+            rent = Rent.objects.get(uuid=scooter_uuid,vacant=False)
+            if not rent.vacant:
                 content = {
                     'code': status.HTTP_200_OK,
                     'msg': 'Scooter is alredy rented',
@@ -193,17 +193,17 @@ def startRent(request, scooter_uuid):
                 }
                 return Response(content)
             else:
-                if not scooter.vacant:
+                if scooter.vacant:
                     Rent.objects.create(
                         uuid=scooter_uuid,
                         name=user.name,
                         token=token,
-                        vacant=True,
+                        vacant=False,
                         update_date=datetime.now()
                     )
-                    scooter.vacant = True
+                    scooter.vacant = False
                     scooter.save()
-                    rent = Rent.objects.get(uuid=scooter_uuid)
+                    rent = Rent.objects.get(uuid=scooter_uuid,vacant=False)
                     content = {
                         'code': status.HTTP_200_OK,
                         'msg': 'Scooter rented',
@@ -225,16 +225,17 @@ def startRent(request, scooter_uuid):
                     }
                     return Response(content)
         except:
-            if not scooter.vacant:
+            if scooter.vacant:
                 Rent.objects.create(
                     uuid=scooter_uuid,
                     name=user.name,
                     token=token,
+                    vacant=False,
                     update_date=datetime.now()
                 )
-                scooter.vacant = True
+                scooter.vacant = False
                 scooter.save()
-                rent = Rent.objects.get(uuid=scooter_uuid)
+                rent = Rent.objects.get(uuid=scooter_uuid,vacant=False)
                 content = {
                     'code': status.HTTP_200_OK,
                     'msg': 'Scooter rented',
@@ -275,10 +276,20 @@ def stopRent(request, scooter_uuid):
             }
             return Response(content)
         try:
-            rent = Rent.objects.get(uuid=scooter_uuid)
-            if rent.vacant:
-                rent.vacant = False
+            rent = Rent.objects.get(uuid=scooter_uuid,vacant=False)
+            if not rent.vacant:
+                rent.vacant = True
                 rent.save()
+                scooter.vacant = True
+                scooter.update_date = datetime.now()
+                scooter.save()
+                content = {
+                    'msg':'End of rental',
+                    'code': status.HTTP_200_OK,
+                    'timestamp': datetime.now(),
+                    'version':'1.0'
+                }
+                return Response(content)
             else:
                 content = {
                     'msg': 'Scooter not vacant ',
