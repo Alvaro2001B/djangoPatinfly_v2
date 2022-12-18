@@ -7,6 +7,9 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from core.models import UserLogin, Scooter, Rent
 from rest_framework import status
+from django.core import serializers
+import json
+from endpoints import views as viewsSerializer
 
 
 # Create your views here.
@@ -79,7 +82,7 @@ def login(request):
             }
             return Response(content)
     elif request.method == 'DELETE':
-        #UserLogin.objects.all().delete()
+        # UserLogin.objects.all().delete()
         Rent.objects.all().delete()
         content = {
             'msg': 'Deleted users',
@@ -179,7 +182,7 @@ def startRent(request, scooter_uuid):
             }
             return Response(content)
         try:
-            rent = Rent.objects.get(uuid=scooter_uuid,vacant=False)
+            rent = Rent.objects.get(uuid=scooter_uuid, vacant=False)
             if not rent.vacant:
                 content = {
                     'code': status.HTTP_200_OK,
@@ -203,7 +206,7 @@ def startRent(request, scooter_uuid):
                     )
                     scooter.vacant = False
                     scooter.save()
-                    rent = Rent.objects.get(uuid=scooter_uuid,vacant=False)
+                    rent = Rent.objects.get(uuid=scooter_uuid, vacant=False)
                     content = {
                         'code': status.HTTP_200_OK,
                         'msg': 'Scooter rented',
@@ -235,7 +238,7 @@ def startRent(request, scooter_uuid):
                 )
                 scooter.vacant = False
                 scooter.save()
-                rent = Rent.objects.get(uuid=scooter_uuid,vacant=False)
+                rent = Rent.objects.get(uuid=scooter_uuid, vacant=False)
                 content = {
                     'code': status.HTTP_200_OK,
                     'msg': 'Scooter rented',
@@ -276,7 +279,7 @@ def stopRent(request, scooter_uuid):
             }
             return Response(content)
         try:
-            rent = Rent.objects.get(uuid=scooter_uuid,vacant=False)
+            rent = Rent.objects.get(uuid=scooter_uuid, vacant=False)
             if not rent.vacant:
                 rent.vacant = True
                 rent.save()
@@ -284,10 +287,10 @@ def stopRent(request, scooter_uuid):
                 scooter.update_date = datetime.now()
                 scooter.save()
                 content = {
-                    'msg':'End of rental',
+                    'msg': 'End of rental',
                     'code': status.HTTP_200_OK,
                     'timestamp': datetime.now(),
-                    'version':'1.0'
+                    'version': '1.0'
                 }
                 return Response(content)
             else:
@@ -307,4 +310,77 @@ def stopRent(request, scooter_uuid):
             }
             return Response(content)
 
-        # if scooter.vacant == 1:
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def rentList(request):
+    if request.method == 'GET':
+        token = request.data['token']
+        user = UserLogin.objects.get(token=token)
+        rentList = Rent.objects.filter(token=token, vacant=True)
+        rentContent = {}
+        """for rents in rentList:
+            if rents.token == token and rents.vacant == True:
+                rentContent = {
+                    'rent': {
+                        'uuid': rents.uuid,
+                        'name': rents.name,
+                        'vacant': rents.vacant,
+                        'created_date': rents.create_date,
+                        'update_date': rents.update_date
+                    },
+
+                }
+        """
+        content = {
+            'msg': 'list of rent ',
+            'code': status.HTTP_200_OK,
+            'UserRents': serializers.serialize('json', Rent.objects.filter(token=token, vacant=True)),
+            'timestamp': datetime.now(),
+            'version': '1.0'
+        }
+        return Response(content)
+    else:
+        content = {
+            'msg': 'Error',
+            'code': status.HTTP_400_BAD_REQUEST,
+            'timestamp': datetime.now,
+            'version': '1.0'
+        }
+        return Response(content)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def infoScooter(request, scooter_uuid):
+    if request.method == 'GET':
+        token = request.data['token']
+        try:
+            user = UserLogin.objects.get(token=token)
+            scooter = Scooter.objects.get(uuid=scooter_uuid)
+            content = {
+                'code': status.HTTP_200_OK,
+                'msg': 'Info scooter',
+                'scooter': {
+                    'uuid': scooter.uuid,
+                    'name': scooter.name,
+                    'longitude': scooter.longitude,
+                    'latitude': scooter.latitude,
+                    'battery level': scooter.battry_level,
+                    'on_mantinace': scooter.on_maintenance,
+                    'last_mantinance': scooter.last_maintenace,
+                    'vacant': scooter.vacant,
+                    'create_date': scooter.create_date
+                },
+                'timestamp': datetime.now(),
+                'version': '1.0'
+            }
+            return Response(content)
+        except:
+            content = {
+                'msg': 'Invalid parameters',
+                'code': status.HTTP_400_BAD_REQUEST,
+                'timestamp': datetime.now(),
+                'version': '1.0'
+            }
+            return Response(content)

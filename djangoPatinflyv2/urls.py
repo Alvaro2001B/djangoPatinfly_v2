@@ -56,7 +56,7 @@ class RentViewSet(viewsets.ModelViewSet):
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'scooter', ScooterViewSet)
-router.register('endpoints/login', LoginViewSet)
+router.register('endpoints/loginList', LoginViewSet)
 router.register('endpoints/rent', RentViewSet)
 #router.register('endpoints/rent/star/(?P<scooter_uuid>[0-9]+)',core_views.startRent )
 
@@ -65,10 +65,11 @@ urlpatterns = [
                   path('api-auth/', include('rest_framework.urls')),
                   path('', include(router.urls)),
                   path('index', frontend_views.index),
-                  path('prueba', core_views.login),
+                  path('endpoints/login', core_views.login),
                   path(r'endpoints/rent/start/<str:scooter_uuid>', core_views.startRent),
                   path('endpoints/validate', core_views.validate),
-                  path('endpoints/rent/stop/<str:scooter_uuid>',  core_views.stopRent)
-                  #path('endpoints/rent/star/<int:pk>', core_views.startRent
+                  path('endpoints/rent/stop/<str:scooter_uuid>',  core_views.stopRent),
+                  path('endpoints/rent', core_views.rentList),
+                  path(r'endpoints/scooter/<str:scooter_uuid>', core_views.infoScooter)
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
