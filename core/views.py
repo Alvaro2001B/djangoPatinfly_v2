@@ -4,12 +4,11 @@ import django
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from core.models import UserLogin, Scooter, Rent
 from rest_framework import status
-from django.core import serializers
 
 
 # Create your views here.
@@ -74,7 +73,7 @@ def login(request):
                 "msg": "User añadido",
                 "token": str(user.token),
                 'code': status.HTTP_201_CREATED,
-                'timestanp': datetime.now(),
+                'timestamp': datetime.now(),
                 'version': '1.0'
             }
             return Response(content)
@@ -84,7 +83,7 @@ def login(request):
         content = {
             'msg': 'Deleted users',
             'code': status.HTTP_200_OK,
-            'timestanp': datetime.now(),
+            'timestamp': datetime.now(),
             'version': '1.0'
         }
         return Response(content)
