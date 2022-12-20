@@ -55,10 +55,10 @@ class RentViewSet(viewsets.ModelViewSet):
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'scooter', ScooterViewSet)
+router.register('scooter', ScooterViewSet)
 router.register('endpoints/loginList', LoginViewSet)
 router.register('endpoints/rent', RentViewSet)
-#router.register('endpoints/rent/star/(?P<scooter_uuid>[0-9]+)',core_views.startRent )
+
 
 urlpatterns = [
                   path('admin_patinfly/', admin.site.urls),
@@ -70,6 +70,8 @@ urlpatterns = [
                   path('endpoints/validate', core_views.validate),
                   path('endpoints/rent/stop/<str:scooter_uuid>',  core_views.stopRent),
                   path('endpoints/rent', core_views.rentList),
-                  path(r'endpoints/scooter/<str:scooter_uuid>', core_views.infoScooter)
+                  path('endpoints/scooter/<str:scooter_uuid>', core_views.infoScooter),
+                  path('endpoints/scooter', core_views.ScooterList),
+                  path('status', core_views.serverStatus)
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

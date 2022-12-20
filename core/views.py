@@ -1,8 +1,10 @@
 from datetime import datetime
+
+import django
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from core.models import UserLogin, Scooter, Rent
@@ -16,12 +18,13 @@ from endpoints import views as viewsSerializer
 
 
 @api_view(['GET', 'POST', 'DELETE'])
-@permission_classes((AllowAny,))
+@permission_classes((IsAuthenticated,))
 def login(request):
+    username = request.data['username']
+    password = request.data['password']
     print(request.data)
     if request.method == 'GET':
-        username = request.data['username']
-        password = request.data['password']
+
         try:
             print(str(username) + "-" + str(password))
             print(UserLogin.objects.all())
@@ -177,8 +180,10 @@ def startRent(request, scooter_uuid):
             scooter = Scooter.objects.get(uuid=scooter_uuid)
         except:
             content = {
-                'msg': 'Invalid parameters',
-                'code': status.HTTP_400_BAD_REQUEST
+                'msg': 'Invalid token',
+                'code': status.HTTP_401_UNAUTHORIZED,
+                'timestamp': datetime.now(),
+                'version': '1.0'
             }
             return Response(content)
         try:
@@ -272,8 +277,8 @@ def stopRent(request, scooter_uuid):
             scooter = Scooter.objects.get(uuid=scooter_uuid)
         except:
             content = {
-                'msg': 'Invalid parameters',
-                'code': status.HTTP_400_BAD_REQUEST,
+                'msg': 'Invalid token',
+                'code': status.HTTP_401_UNAUTHORIZED,
                 'timestamp': datetime.now(),
                 'version': '1.0'
             }
@@ -316,22 +321,17 @@ def stopRent(request, scooter_uuid):
 def rentList(request):
     if request.method == 'GET':
         token = request.data['token']
-        user = UserLogin.objects.get(token=token)
-        rentList = Rent.objects.filter(token=token, vacant=True)
-        rentContent = {}
-        """for rents in rentList:
-            if rents.token == token and rents.vacant == True:
-                rentContent = {
-                    'rent': {
-                        'uuid': rents.uuid,
-                        'name': rents.name,
-                        'vacant': rents.vacant,
-                        'created_date': rents.create_date,
-                        'update_date': rents.update_date
-                    },
+        try:
+            user = UserLogin.objects.get(token=token)
+        except:
+            content = {
+                'msg': 'Invalid token',
+                'code': status.HTTP_401_UNAUTHORIZED,
+                'timestamp': datetime.now(),
+                'version': '1.0'
+            }
+            return Response(content)
 
-                }
-        """
         content = {
             'msg': 'list of rent ',
             'code': status.HTTP_200_OK,
@@ -352,11 +352,55 @@ def rentList(request):
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
+def ScooterList(request):
+    if request.method == 'GET':
+        token = request.data['token']
+        try:
+            try:
+                user = UserLogin.objects.get(token=token)
+            except:
+                content = {
+                    'msg': 'Invalid token',
+                    'code': status.HTTP_401_UNAUTHORIZED,
+                    'timestamp': datetime.now(),
+                    'version': '1.0'
+                }
+                return Response(content)
+            scoooterList = Scooter.objects.all()
+            content = {
+                'msg': 'scooter list',
+                'code': status.HTTP_200_OK,
+                'scooterList': serializers.serialize('json', Scooter.objects.all()),
+                'timestamp': datetime.now,
+                'version': '1.0'
+            }
+            return Response(content)
+        except:
+            content = {
+                'msg': 'Error',
+                'code': status.HTTP_400_BAD_REQUEST,
+                'timestamp': datetime.now,
+                'version': '1.0'
+            }
+            return Response(content)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
 def infoScooter(request, scooter_uuid):
     if request.method == 'GET':
         token = request.data['token']
         try:
-            user = UserLogin.objects.get(token=token)
+            try:
+                user = UserLogin.objects.get(token=token)
+            except:
+                content = {
+                    'msg': 'Invalid token',
+                    'code': status.HTTP_401_UNAUTHORIZED,
+                    'timestamp': datetime.now(),
+                    'version': '1.0'
+                }
+                return Response(content)
             scooter = Scooter.objects.get(uuid=scooter_uuid)
             content = {
                 'code': status.HTTP_200_OK,
@@ -378,9 +422,31 @@ def infoScooter(request, scooter_uuid):
             return Response(content)
         except:
             content = {
-                'msg': 'Invalid parameters',
+                'msg': 'Scooter does not exists',
                 'code': status.HTTP_400_BAD_REQUEST,
                 'timestamp': datetime.now(),
                 'version': '1.0'
             }
             return Response(content)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def serverStatus(request):
+    try:
+        content = {
+            'msg':'Server status',
+            'code':status.HTTP_200_OK,
+            'Server Status': django.VERSION,
+            'timestamp': datetime.now(),
+            'version': '1.0'
+        }
+        return Response(content)
+    except:
+        content = {
+            'msg': 'Server status failed',
+            'code': status.HTTP_400_BAD_REQUEST,
+            'timestamp': datetime.now(),
+            'version': '1.0'
+        }
+        return Response(content)
