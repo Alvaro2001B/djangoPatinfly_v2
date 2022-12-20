@@ -10,15 +10,13 @@ from django.contrib.auth import authenticate
 from core.models import UserLogin, Scooter, Rent
 from rest_framework import status
 from django.core import serializers
-import json
-from endpoints import views as viewsSerializer
 
 
 # Create your views here.
 
 
 @api_view(['GET', 'POST', 'DELETE'])
-@permission_classes((IsAuthenticated,))
+@permission_classes((AllowAny,))
 def login(request):
     username = request.data['username']
     password = request.data['password']
@@ -37,10 +35,6 @@ def login(request):
                 'version': '1.0'
             }
             return Response(content)
-
-        # pwd_valid = check_password(password, user.password)
-        # if not pwd_valid:
-        #    return Response("Contraseña invalida")
         content = {
             "Token": user.token,
             # .split(':')[1].split(">")[0],
@@ -85,8 +79,8 @@ def login(request):
             }
             return Response(content)
     elif request.method == 'DELETE':
-        # UserLogin.objects.all().delete()
-        Rent.objects.all().delete()
+        UserLogin.objects.all().delete()
+        # Rent.objects.all().delete()
         content = {
             'msg': 'Deleted users',
             'code': status.HTTP_200_OK,
@@ -335,7 +329,7 @@ def rentList(request):
         content = {
             'msg': 'list of rent ',
             'code': status.HTTP_200_OK,
-            'UserRents': serializers.serialize('json', Rent.objects.filter(token=token, vacant=True)),
+            'UserRents': Rent.objects.filter(token=token, vacant=True).values(),
             'timestamp': datetime.now(),
             'version': '1.0'
         }
@@ -366,12 +360,11 @@ def ScooterList(request):
                     'version': '1.0'
                 }
                 return Response(content)
-            scoooterList = Scooter.objects.all()
             content = {
                 'msg': 'scooter list',
                 'code': status.HTTP_200_OK,
-                'scooterList': serializers.serialize('json', Scooter.objects.all()),
-                'timestamp': datetime.now,
+                'ScooterList': Scooter.objects.all().values(),
+                'timestamp': datetime.now(),
                 'version': '1.0'
             }
             return Response(content)
@@ -435,8 +428,8 @@ def infoScooter(request, scooter_uuid):
 def serverStatus(request):
     try:
         content = {
-            'msg':'Server status',
-            'code':status.HTTP_200_OK,
+            'msg': 'Server status',
+            'code': status.HTTP_200_OK,
             'Server Status': django.VERSION,
             'timestamp': datetime.now(),
             'version': '1.0'
