@@ -15,12 +15,6 @@ from rest_framework import status
 # Create your views here.
 
 
-@api_view(['GET', 'POST'])
-@permission_classes((AllowAny,))
-def loginWithGoogle(request):
-    return render(request, "frontendLogin/login_redirect.html,", {})
-
-
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes((AllowAny,))
 def login(request):

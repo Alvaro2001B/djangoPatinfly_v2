@@ -61,6 +61,7 @@ router.register('endpoints/rent', RentViewSet)
 
 
 urlpatterns = [
+                  path('', include('frontend.urls')),
                   path('admin_patinfly/', admin.site.urls),
                   path('api-auth/', include('rest_framework.urls')),
                   path('', include(router.urls)),
@@ -72,7 +73,6 @@ urlpatterns = [
                   path('endpoints/rent', core_views.rentList),
                   path('endpoints/scooter/<str:scooter_uuid>', core_views.infoScooter),
                   path('endpoints/scooter', core_views.ScooterList),
-                  path('status', core_views.serverStatus),
-                  path('loginWithGoogle', core_views.loginWithGoogle)
+                  path('status', core_views.serverStatus)
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
