@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+<body>
+<button onclick="loginGoogle()">Login</button>
+<a id="user_name"></a>
+
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+<script>
+    const firebaseApp = firebase.initializeApp({
+        apiKey: "AIzaSyDM7qN2Ia5kjAyRyCx6YnxKu-06Z2FzWlU",
+        authDomain: "autenticationlasm.firebaseapp.com",
+        projectId: "autenticationlasm",
+        storageBucket: "autenticationlasm.appspot.com",
+        messagingSenderId: "743872659682",
+        appId: "1:743872659682:web:eca022833ac861539adebb",
+        measurementId: "G-KN06TQNSE2"
+    });
+    const db = firebaseApp.firestore();
+    const auth = firebaseApp.auth();
+
+    function loginGoogle(){
+        var provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth()
+            .signInWithPopUp(provider)
+            .then((result) => {
+                /** @type {firebase.auth.OAuthCredential} */
+                var credential = result.credential;
+
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                var token = credential.accessToken;
+                // The signed-in user info.
+                console.log("*************")
+                console.log(token)
+                var user = result.user;
+                console.log(user)
+
+
+            }).catch((error) => {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            // ...
+            console.log(errorCode)
+            console.log(errorMessage)
+        }).error{
+            console.log()
+        };
+    }
+</script>
+</body>
+
+<meta charset="UTF-8">
+<title>Authentication</title>
+</html>

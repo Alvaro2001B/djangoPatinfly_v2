@@ -26,7 +26,7 @@ from djangoPatinflyv2 import settings
 from endpoints.views import UserSerializer, ScooterSerializer, LoginSerializer, RentSerializer
 from frontend import views as frontend_views
 from core import views as core_views
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 
 
 # ViewSets define the view behavior.
@@ -66,12 +66,13 @@ urlpatterns = [
                   path('', include(router.urls)),
                   path('index', frontend_views.index),
                   path('endpoints/login', core_views.login),
-                  path(r'endpoints/rent/start/<str:scooter_uuid>', core_views.startRent),
+                  path('endpoints/rent/start/<str:scooter_uuid>', core_views.startRent),
                   path('endpoints/validate', core_views.validate),
                   path('endpoints/rent/stop/<str:scooter_uuid>',  core_views.stopRent),
                   path('endpoints/rent', core_views.rentList),
                   path('endpoints/scooter/<str:scooter_uuid>', core_views.infoScooter),
                   path('endpoints/scooter', core_views.ScooterList),
-                  path('status', core_views.serverStatus)
+                  path('status', core_views.serverStatus),
+                  path('loginWithGoogle', core_views.loginWithGoogle)
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

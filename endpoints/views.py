@@ -28,9 +28,6 @@ class LoginSerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = [ 'create_date', 'update_date', 'notification_uptadete', ]
 
 
-
-
-
 class RentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Rent

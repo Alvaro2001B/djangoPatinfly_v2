@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import django
+from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -14,6 +15,12 @@ from rest_framework import status
 # Create your views here.
 
 
+@api_view(['GET', 'POST'])
+@permission_classes((AllowAny,))
+def loginWithGoogle(request):
+    return render(request, "frontendLogin/login_redirect.html,", {})
+
+
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes((AllowAny,))
 def login(request):
@@ -23,10 +30,8 @@ def login(request):
     if request.method == 'GET':
 
         try:
-            print(str(username) + "-" + str(password))
-            print(UserLogin.objects.all())
-            user = UserLogin.objects.get(name=username)
-        except User.DoesNotExist:
+            user = UserLogin.objects.get(name=username, password=password)
+        except:
             content = {
                 'msg': 'non-existent user',
                 'code': status.HTTP_400_BAD_REQUEST,
@@ -36,16 +41,15 @@ def login(request):
             return Response(content)
         content = {
             "Token": user.token,
-            # .split(':')[1].split(">")[0],
             "Code": status.HTTP_200_OK,
             'timestanp': datetime.now(),
             'version': '1.0'
         }
         return Response(content)
     elif request.method == 'POST':
-        username = request.data['username']
+        #username = request.data['username']
         secondname = request.data['secondname']
-        password = request.data['password']
+        #password = request.data['password']
 
         try:
             UserLogin.objects.get(name=username)
@@ -173,7 +177,7 @@ def startRent(request, scooter_uuid):
             scooter = Scooter.objects.get(uuid=scooter_uuid)
         except:
             content = {
-                'msg': 'Invalid token',
+                'msg': 'Invalid data',
                 'code': status.HTTP_401_UNAUTHORIZED,
                 'timestamp': datetime.now(),
                 'version': '1.0'
@@ -184,7 +188,7 @@ def startRent(request, scooter_uuid):
             if not rent.vacant:
                 content = {
                     'code': status.HTTP_200_OK,
-                    'msg': 'Scooter is alredy rented',
+                    'msg': 'Scooter is already rented',
                     'rent': {
                         'uuid': rent.uuid,
                         'date_start': rent.update_date
@@ -193,38 +197,6 @@ def startRent(request, scooter_uuid):
                     'version': '1.0'
                 }
                 return Response(content)
-            else:
-                if scooter.vacant:
-                    Rent.objects.create(
-                        uuid=scooter_uuid,
-                        name=user.name,
-                        token=token,
-                        vacant=False,
-                        update_date=datetime.now()
-                    )
-                    scooter.vacant = False
-                    scooter.save()
-                    rent = Rent.objects.get(uuid=scooter_uuid, vacant=False)
-                    content = {
-                        'code': status.HTTP_200_OK,
-                        'msg': 'Scooter rented',
-                        'rent': {
-                            'uuid': rent.uuid,
-                            'date_start': rent.update_date
-                        },
-                        'timestamp': datetime.now(),
-                        'version': '1.0'
-                    }
-                    return Response(content)
-                else:
-                    content = {
-                        'code': status.HTTP_405_METHOD_NOT_ALLOWED,
-                        'msg': 'Scooter is vacant',
-                        'rent': '{}',
-                        'timestamp': datetime.now(),
-                        'version': '1.0'
-                    }
-                    return Response(content)
         except:
             if scooter.vacant:
                 Rent.objects.create(
@@ -429,7 +401,7 @@ def serverStatus(request):
         content = {
             'msg': 'Server status',
             'code': status.HTTP_200_OK,
-            'Server Status': django.VERSION,
+            'Django version': django.VERSION,
             'timestamp': datetime.now(),
             'version': '1.0'
         }
