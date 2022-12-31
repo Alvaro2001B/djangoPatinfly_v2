@@ -13,6 +13,42 @@ from rest_framework import status
 
 
 # Create your views here.
+#@api_view(['POST'])
+
+def loginWithGoogle(request):
+    print(request.data)
+    username = request.data['username']
+    password = request.data['password']
+    token = request.data['token']
+    if request.method == 'POST':
+        try:
+            user = User.objects.get(username=username)
+            content = {
+                "msg": "existing user",
+                "code": status.HTTP_400_BAD_REQUEST,
+                'timestanp': datetime.now(),
+                'version': '1.0'
+            }
+            return Response(content)
+        except:
+            User.objects.create_superuser(username=username,password=password)
+            userS = User.objects.get(username=username)
+            strSplit = username.split(" ")
+            UserLogin.objects.create(
+                name=strSplit[0],
+                secondname=strSplit[1]+" "+strSplit[2],
+                password=password,
+                token=token
+            )
+            user = UserLogin.objects.get(username= strSplit[0])
+            content = {
+                "msg": "User añadido",
+                "token": str(user.token),
+                'code': status.HTTP_201_CREATED,
+                'timestamp': datetime.now(),
+                'version': '1.0'
+            }
+            return Response(content)
 
 
 @api_view(['GET', 'POST', 'DELETE'])

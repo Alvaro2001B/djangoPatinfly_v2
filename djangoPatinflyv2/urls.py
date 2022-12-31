@@ -73,6 +73,7 @@ urlpatterns = [
                   path('endpoints/rent', core_views.rentList),
                   path('endpoints/scooter/<str:scooter_uuid>', core_views.infoScooter),
                   path('endpoints/scooter', core_views.ScooterList),
-                  path('status', core_views.serverStatus)
+                  path('status', core_views.serverStatus),
+                  path('prueba', core_views.loginWithGoogle)
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

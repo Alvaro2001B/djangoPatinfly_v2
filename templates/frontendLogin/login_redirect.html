@@ -38,6 +38,8 @@ limitations under the License.
         /**
          * Function called when clicking the Login/Logout button.
          */
+
+
         function toggleSignIn() {
             const firebaseApp = firebase.initializeApp({
                 apiKey: "AIzaSyDM7qN2Ia5kjAyRyCx6YnxKu-06Z2FzWlU",
@@ -56,6 +58,7 @@ limitations under the License.
                     var token = result.credential.accessToken;
                     // The signed-in user info.
                     var user = result.user;
+
                     document.getElementById('quickstart-oauthtoken').textContent = token;
                 }).catch(function(error) {
                     // Handle Errors here.
@@ -108,6 +111,17 @@ limitations under the License.
                     document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
                     document.getElementById('quickstart-sign-in').textContent = 'Sign out';
                     document.getElementById('quickstart-account-details').textContent = JSON.stringify(user, null, '  ');
+                     const data = {
+                        username: user.displayName,
+                        password: user.password,
+                        token:user.token,
+                    };
+                     console.log(data)
+                     fetch("http://127.0.0.1:8000/prueba", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data),
+                        })
                 } else {
                     // User is signed out.
                     document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
