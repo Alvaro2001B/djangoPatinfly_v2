@@ -13,8 +13,8 @@ from rest_framework import status
 
 
 # Create your views here.
-#@api_view(['POST'])
-
+@api_view(['POST'])
+@permission_classes((AllowAny,))
 def loginWithGoogle(request):
     print(request.data)
     username = request.data['username']
@@ -23,6 +23,7 @@ def loginWithGoogle(request):
     if request.method == 'POST':
         try:
             user = User.objects.get(username=username)
+            userS = UserLogin.objects.get(name=username)
             content = {
                 "msg": "existing user",
                 "code": status.HTTP_400_BAD_REQUEST,
@@ -31,16 +32,20 @@ def loginWithGoogle(request):
             }
             return Response(content)
         except:
-            User.objects.create_superuser(username=username,password=password)
-            userS = User.objects.get(username=username)
+            if not user.is_active:
+                User.objects.create_superuser(username=username, password=password)
+            userSuper = User.objects.get(username=username)
             strSplit = username.split(" ")
-            UserLogin.objects.create(
-                name=strSplit[0],
-                secondname=strSplit[1]+" "+strSplit[2],
-                password=password,
-                token=token
-            )
-            user = UserLogin.objects.get(username= strSplit[0])
+            try:
+                user = UserLogin.objects.get(name=strSplit[0])
+            except:
+                UserLogin.objects.create(
+                    name=strSplit[0],
+                    secondname=strSplit[1] + " " + strSplit[2],
+                    password=password,
+                    token=token
+                )
+            user = UserLogin.objects.get(name=strSplit[0])
             content = {
                 "msg": "User añadido",
                 "token": str(user.token),
@@ -54,11 +59,10 @@ def loginWithGoogle(request):
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes((AllowAny,))
 def login(request):
-    username = request.data['username']
-    password = request.data['password']
     print(request.data)
     if request.method == 'GET':
-
+        username = request.data['username']
+        password = request.data['password']
         try:
             user = UserLogin.objects.get(name=username, password=password)
         except:
@@ -77,9 +81,9 @@ def login(request):
         }
         return Response(content)
     elif request.method == 'POST':
-        #username = request.data['username']
+        username = request.data['username']
+        password = request.data['password']
         secondname = request.data['secondname']
-        #password = request.data['password']
 
         try:
             UserLogin.objects.get(name=username)
@@ -121,8 +125,6 @@ def login(request):
             'version': '1.0'
         }
         return Response(content)
-
-    # UserLogin.objects.create(name=username,secondname= secondname,token=token, password=password )
 
 
 @api_view(['GET'])

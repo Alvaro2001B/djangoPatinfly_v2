@@ -5,12 +5,13 @@
 </head>
 <body>
 
-<h1>{{ project_name }}</h1>
+<h1>Has iniciado sesion con google</h1>
+<h2>Lista de scooters</h2>
     {% for scooter in scooters %}
-        {{ scooter.name }}<br>
+        {{ scooter.name}}<br>
     {% endfor %}
 
-<p>{{ scooters }}</p>
+<button class="mdl-button mdl-js-button mdl-button--raised" id="quickstart-sign-in">Sign out</button>
 
 </body>
 </html>
