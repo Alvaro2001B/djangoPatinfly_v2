@@ -97,6 +97,7 @@ limitations under the License.
                 measurementId: "G-KN06TQNSE2"
             });
             // Listening for auth state changes.
+
             firebaseApp.auth().onAuthStateChanged(function(user) {
                 if (user) {
                     // User is signed in.
@@ -120,7 +121,7 @@ limitations under the License.
                     request.open('POST',"http://127.0.0.1:8000/prueba" , true);
                     request.setRequestHeader('Content-Type', 'application/json');
                     request.send(JSON.stringify(data));
-                    window.location.replace('index')
+                   // window.location.replace('index');
                 } else {
                     // User is signed out.
                     document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';

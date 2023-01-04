@@ -21,6 +21,7 @@ from django.urls import path, include, re_path
 from rest_framework import routers, serializers, viewsets
 from rest_framework.decorators import permission_classes
 
+import frontend.views
 from core.models import Scooter, UserLogin, Rent
 from djangoPatinflyv2 import settings
 from endpoints.views import UserSerializer, ScooterSerializer, LoginSerializer, RentSerializer
@@ -74,6 +75,7 @@ urlpatterns = [
                   path('endpoints/scooter/<str:scooter_uuid>', core_views.infoScooter),
                   path('endpoints/scooter', core_views.ScooterList),
                   path('status', core_views.serverStatus),
-                  path('prueba', core_views.loginWithGoogle)
+                  path('prueba', core_views.loginWithGoogle),
+                  path('login_redirect', frontend_views.loginWithGoogle)
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
