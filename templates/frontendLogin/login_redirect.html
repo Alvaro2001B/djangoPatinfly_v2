@@ -117,7 +117,7 @@ limitations under the License.
                         token:user.providerData[0].uid,
                     };
                     console.log(data)
-                    request.open('POST',"http://127.0.0.1:8000/prueba" , true);
+                    request.open('POST',"http://127.0.0.1:8000/signIn" , true);
                     request.setRequestHeader('Content-Type', 'application/json');
                     request.send(JSON.stringify(data));
                     window.location.replace('index');

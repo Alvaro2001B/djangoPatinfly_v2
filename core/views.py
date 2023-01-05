@@ -26,8 +26,8 @@ def loginWithGoogle(request):
             userS = UserLogin.objects.get(name=username.split(" ")[0])
             if userS.token == "":
                 newToken = Token.objects.get_or_create(user=user)
-                userS.token = newToken[0]
-                userS.create_date = datetime.now()
+                userS.token = str(newToken[0])
+                userS.update_date = datetime.now()
                 userS.save()
                 content = {
                     "msg": "User validated",
@@ -35,6 +35,7 @@ def loginWithGoogle(request):
                     'timestanp': datetime.now(),
                     'version': '1.0'
                 }
+                return Response(content)
 
             content = {
                 "msg": "existing user",
@@ -45,7 +46,7 @@ def loginWithGoogle(request):
             return Response(content)
         except:
             userSuper = User.objects.get_or_create(username=username.split(" ")[0], password=password)
-            tokenS= Token.objects.get_or_create(user=User.objects.get(username=username.split(" ")[0]))
+            tokenS = Token.objects.get_or_create(user=User.objects.get(username=username.split(" ")[0]))
             strSplit = username.split(" ")
             try:
                 user = UserLogin.objects.get(name=strSplit[0])
@@ -54,7 +55,8 @@ def loginWithGoogle(request):
                     name=strSplit[0],
                     secondname=strSplit[1] + " " + strSplit[2],
                     password=password,
-                    token=tokenS[0]
+                    token=tokenS[0],
+                    update_date=datetime.now()
                 )
             user = UserLogin.objects.get(name=strSplit[0])
             content = {
@@ -76,6 +78,7 @@ def signOut(request):
         try:
             user = UserLogin.objects.get(name=username.split(" ")[0], password=password)
             user.token = ""
+            user.update_date = datetime.now()
             user.save()
             content = {
                 'msg': 'User validated',
@@ -140,7 +143,8 @@ def login(request):
                 name=username,
                 secondname=secondname,
                 password=password,
-                token=""
+                token="",
+                update_date=datetime.now()
             )
             user = UserLogin.objects.get(name=username)
             user.token = str(token).split(':')[1].split(">")[0].split(" ")[1]
@@ -191,10 +195,10 @@ def validate(request):
                 timeNow = datetime.now()
                 print(timeNow)
                 print(user.create_date)
-                print(timeNow.date() - user.create_date.date())
-                days = (timeNow.date() - user.create_date.date()).days
+                print(timeNow.date() - user.update_date.date())
+                days = (timeNow.date() - user.update_date.date()).days
                 print(days)
-                if int(days) < int(3):
+                if int(days) < int(-1):
                     content = {
                         'msg': 'User validated',
                         'code': status.HTTP_200_OK,
@@ -204,13 +208,13 @@ def validate(request):
                     return Response(content)
                 else:
                     print(user)
-                    user.token = ""
-                    user.save()
+                    #user.token = ""
+                    #user.save()
                     Token.objects.filter(user=userT).delete()
                     token = Token.objects.get_or_create(user=userT)
                     print(token)
                     user.token = str(token).split(':')[1].split(">")[0].split(" ")[1]
-                    user.create_date = datetime.now()
+                    user.update_date = datetime.now()
                     user.save()
                     content = {
                         'msg': 'Create a new token. User validated',

@@ -75,7 +75,7 @@ urlpatterns = [
                   path('endpoints/scooter/<str:scooter_uuid>', core_views.infoScooter),
                   path('endpoints/scooter', core_views.ScooterList),
                   path('status', core_views.serverStatus),
-                  path('prueba', core_views.loginWithGoogle),
+                  path('signIn', core_views.loginWithGoogle),
                   path('login_redirect', frontend_views.loginWithGoogle),
                   path('signOut', core_views.signOut)
 
