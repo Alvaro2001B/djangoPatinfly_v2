@@ -22,8 +22,20 @@ def loginWithGoogle(request):
     token = request.data['token']
     if request.method == 'POST':
         try:
-            user = User.objects.get(username=username)
-            userS = UserLogin.objects.get(name=username)
+            user = User.objects.get(username=username.split(" ")[0])
+            userS = UserLogin.objects.get(name=username.split(" ")[0])
+            if userS.token == "":
+                newToken = Token.objects.get_or_create(user=user)
+                userS.token = newToken[0]
+                userS.create_date = datetime.now()
+                userS.save()
+                content = {
+                    "msg": "User validated",
+                    "code": status.HTTP_200_OK,
+                    'timestanp': datetime.now(),
+                    'version': '1.0'
+                }
+
             content = {
                 "msg": "existing user",
                 "code": status.HTTP_400_BAD_REQUEST,
@@ -32,9 +44,8 @@ def loginWithGoogle(request):
             }
             return Response(content)
         except:
-            if not user.is_active:
-                User.objects.create_superuser(username=username, password=password)
-            userSuper = User.objects.get(username=username)
+            userSuper = User.objects.get_or_create(username=username.split(" ")[0], password=password)
+            tokenS= Token.objects.get_or_create(user=User.objects.get(username=username.split(" ")[0]))
             strSplit = username.split(" ")
             try:
                 user = UserLogin.objects.get(name=strSplit[0])
@@ -43,7 +54,7 @@ def loginWithGoogle(request):
                     name=strSplit[0],
                     secondname=strSplit[1] + " " + strSplit[2],
                     password=password,
-                    token=token
+                    token=tokenS[0]
                 )
             user = UserLogin.objects.get(name=strSplit[0])
             content = {
@@ -51,6 +62,33 @@ def loginWithGoogle(request):
                 "token": str(user.token),
                 'code': status.HTTP_201_CREATED,
                 'timestamp': datetime.now(),
+                'version': '1.0'
+            }
+            return Response(content)
+
+
+@api_view(['PUT'])
+@permission_classes((AllowAny,))
+def signOut(request):
+    if request.method == 'PUT':
+        username = request.data['username']
+        password = request.data['password']
+        try:
+            user = UserLogin.objects.get(name=username.split(" ")[0], password=password)
+            user.token = ""
+            user.save()
+            content = {
+                'msg': 'User validated',
+                'code': status.HTTP_200_OK,
+                'timestanp': datetime.now(),
+                'version': '1.0'
+            }
+            return Response(content)
+        except:
+            content = {
+                'msg': 'non-existent user',
+                'code': status.HTTP_400_BAD_REQUEST,
+                'timestanp': datetime.now(),
                 'version': '1.0'
             }
             return Response(content)
@@ -137,7 +175,8 @@ def validate(request):
         print('Request:' + str(username) + '-' + str(token))
         try:
             user = UserLogin.objects.get(name=username)
-            userT = authenticate(username=username, password=user.password)
+            print(user.password)
+            userT = User.objects.get(username=username)
             tokenUser = Token.objects.get_or_create(user=userT)
             print('User:' + str(user.name) + '-' + str(tokenUser[0]))
             if user.token == "":
@@ -148,7 +187,7 @@ def validate(request):
                     'version': '1.0'
                 }
                 return Response(content)
-            elif str(tokenUser) == token:
+            elif str(tokenUser[0]) == token:
                 timeNow = datetime.now()
                 print(timeNow)
                 print(user.create_date)
@@ -171,6 +210,7 @@ def validate(request):
                     token = Token.objects.get_or_create(user=userT)
                     print(token)
                     user.token = str(token).split(':')[1].split(">")[0].split(" ")[1]
+                    user.create_date = datetime.now()
                     user.save()
                     content = {
                         'msg': 'Create a new token. User validated',
