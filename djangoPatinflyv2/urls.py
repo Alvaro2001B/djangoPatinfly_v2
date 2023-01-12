@@ -37,15 +37,18 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+
 @permission_classes((AllowAny,))
 class ScooterViewSet(viewsets.ModelViewSet):
     queryset = Scooter.objects.all()
     serializer_class = ScooterSerializer
 
+
 @permission_classes((AllowAny,))
 class LoginViewSet(viewsets.ModelViewSet):
     queryset = UserLogin.objects.all()
     serializer_class = LoginSerializer
+
 
 @permission_classes((AllowAny,))
 class RentViewSet(viewsets.ModelViewSet):
@@ -60,7 +63,6 @@ router.register('scooter', ScooterViewSet)
 router.register('endpoints/loginList', LoginViewSet)
 router.register('endpoints/rent', RentViewSet)
 
-
 urlpatterns = [
                   path('', include('frontend.urls')),
                   path('admin_patinfly/', admin.site.urls),
@@ -70,7 +72,7 @@ urlpatterns = [
                   path('endpoints/login', core_views.login),
                   path('endpoints/rent/start/<str:scooter_uuid>', core_views.startRent),
                   path('endpoints/validate', core_views.validate),
-                  path('endpoints/rent/stop/<str:scooter_uuid>',  core_views.stopRent),
+                  path('endpoints/rent/stop/<str:scooter_uuid>', core_views.stopRent),
                   path('endpoints/rent', core_views.rentList),
                   path('endpoints/scooter/<str:scooter_uuid>', core_views.infoScooter),
                   path('endpoints/scooter', core_views.ScooterList),

@@ -1,7 +1,5 @@
-from datetime import datetime
-
 import django
-from django.shortcuts import render
+from datetime import datetime
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -12,7 +10,6 @@ from core.models import UserLogin, Scooter, Rent
 from rest_framework import status
 
 
-# Create your views here.
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 def loginWithGoogle(request):
@@ -62,7 +59,7 @@ def loginWithGoogle(request):
             content = {
                 "msg": "User añadido",
                 "token": str(user.token),
-                'code': status.HTTP_201_CREATED,
+                'code': status.HTTP_200_OK,
                 'timestamp': datetime.now(),
                 'version': '1.0'
             }
@@ -198,7 +195,7 @@ def validate(request):
                 print(timeNow.date() - user.update_date.date())
                 days = (timeNow.date() - user.update_date.date()).days
                 print(days)
-                if int(days) < int(-1):
+                if int(days) < int(3):
                     content = {
                         'msg': 'User validated',
                         'code': status.HTTP_200_OK,
@@ -208,8 +205,8 @@ def validate(request):
                     return Response(content)
                 else:
                     print(user)
-                    #user.token = ""
-                    #user.save()
+                    # user.token = ""
+                    # user.save()
                     Token.objects.filter(user=userT).delete()
                     token = Token.objects.get_or_create(user=userT)
                     print(token)

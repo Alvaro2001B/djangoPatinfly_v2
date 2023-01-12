@@ -24,7 +24,7 @@
     const db = firebaseApp.firestore();
     const auth = firebaseApp.auth();
 
-    function loginGoogle(){
+    function loginGoogle() {
         var provider = new firebase.auth.GoogleAuthProvider();
         firebase.auth()
             .signInWithPopUp(provider)
@@ -52,9 +52,11 @@
             // ...
             console.log(errorCode)
             console.log(errorMessage)
-        }).error{
+        }).error
+        {
             console.log()
-        };
+        }
+        ;
     }
 </script>
 </body>

@@ -15,7 +15,6 @@
 
 ## Crear un usuario
 
-
 ````shell
  .\patinfly_venv\Scripts\python.exe .\manage.py createsuperuser
 ````

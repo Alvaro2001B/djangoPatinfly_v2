@@ -25,7 +25,7 @@ class LoginSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserLogin
         fields = ['name', 'secondname', 'password', 'token', 'create_date', 'update_date', 'notification_uptadete']
-        read_only_fields = [ 'create_date', 'update_date', 'notification_uptadete', ]
+        read_only_fields = ['create_date', 'update_date', 'notification_uptadete', ]
 
 
 class RentSerializer(serializers.HyperlinkedModelSerializer):
